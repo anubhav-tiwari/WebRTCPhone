@@ -2,7 +2,9 @@
 // init 
 //
 var localIP; 
-var gatewayIP = '172.16.95.1';
+//var gatewayIP = '172.16.95.1';
+//var gatewayIP = '10.0.247.1';
+gatewayIP = '103.115.212.2';
 let phone;
 let session;
 let watchStatus;
@@ -67,27 +69,28 @@ pc.onicecandidate = function(ice)
  if (ice && ice.candidate && ice.candidate.candidate)
  {
   localIP = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate)[1];
+	//localIP = "106.196.62.231";
   console.log('my IP: ', localIP);
  }
 };
 	
 
 	$('#host').on('change',function(){
-		console.log('onchane.....');
+		console.log('onchange.....');
 		if ($('#host').val()=='10.18.0.132') {
-			$('#port').val('443');
+			$('#port').val('8089');
 			$('#sip-port').val('5060');
-			$('#number').val('sip:111@10.18.0.132:5060');
+			$('#number').val('777');
 		}
-		else if($('#host').val()=='10.18.0.129') {
-			$('#port').val('4443');
-			$('#sip-port').val('5060');
-			$('#number').val('sip:111@10.18.0.129:5060');			
-		}
+		else if($('#host').val()=='10.18.0.63') {
+                        $('#port').val('8087');
+                        $('#sip-port').val('5060');
+                        $('#number').val('777');
+                }
 		else {
-			$('#port').val('4443');
-			$('#sip-port').val('');
-			$('#number').val('sip:9560700235@sip.antisip.com');		}
+			$('#port').val('8089');
+			$('#sip-port').val('5060');
+			$('#number').val('777');		}
 	})
 
 
@@ -225,16 +228,28 @@ $("#status").click(function() {
 		//let peer = "sip:9560700235@sip.antisip.com";
 
 		//let socket = new JsSIP.WebSocketInterface("wss://" + host + ":" + port);
-		let socket = new JsSIP.WebSocketInterface(ws_protocol+"://" + host + ":" + port + "/ws");
+		var socket;
+		if ($('#host').val()=='10.18.0.132'){
+			//socket = new JsSIP.WebSocketInterface(ws_protocol+"://webrtc-network.one97.delhi.net:" + port + "/ws");	// Using 132 Domain
+			socket = new JsSIP.WebSocketInterface(ws_protocol+"://" + host + ":" + port + "/ws");
+		}
+		else if ($('#host').val()=='10.200.238.6') {
+			socket = new JsSIP.WebSocketInterface(ws_protocol+":obd.srilanka.airtel.itm" + "/ws");	// Using sri lanka Domain
+		}
+
+		else
+		{	
+			socket = new JsSIP.WebSocketInterface(ws_protocol+"://" + host + ":" + port + "/ws");
+		}
 		//let socket = new JsSIP.WebSocketInterface("wss://sip.antisip.com:4443");
 		//socket.via_transport = "udp";
 
 		let regOptions = {
 			"sockets"			: [ socket ],
 			"uri"      			: peer,
-			"contact_uri"		: peer,
+			"contact_uri"			: peer,
 			"password"			: secret,
-			"register_expires"	: 7000
+			"register_expires"	: 77000
 		};
 
 		JsSIP.debug.enable("JsSIP:*");
@@ -337,7 +352,8 @@ $("#status").click(function() {
 							        console.log('1', parts[1]);
 							        console.log('2', parts[2]);*/
 							        console.log('parts.length', parts.length);
-							        var sdpPort = Math.floor(Math.random() * (65534 - 7078 + 1) + 7078);
+							        //var sdpPort = Math.floor(Math.random() * (65534 - 7078 + 1) + 7078);
+							        var sdpPort = Math.floor(Math.random() * (6020 - 6000 + 1) + 6000);
 
 							        var tmpStr = parts[0] + " " + sdpPort;
 						        	for (var i=2; i<parts.length; i++) {
@@ -467,11 +483,20 @@ $("#status").click(function() {
 	        });
 
 			if(session.direction === "incoming"){
+			//	session.answer(callOptions);	//Auto Answer
+				//For Auto hangup
+			/*	setTimeout(function autoHangup(){
+                	console.log('Auto Hangup');
+                    if (session && (session.isEstablished() || session.isInProgress())) session.terminate();
+                     }, 100000);	*/
+                //For Auto hangup
+                
 				swal({
 					closeOnEsc: false,
 					closeOnClickOutside: false,
 					title: "Incoming call",
-					text: "from: " + session.remote_identity.display_name,
+					text: "from: " + session.remote_identity.display_name,// + session.remote_identity.uri,
+					
 					icon: "info",
 					buttons: {
 						cancel: "Reject",
@@ -487,7 +512,7 @@ $("#status").click(function() {
 					} else {
 						session.terminate();
 					}
-				});
+				}); 
 	        }
 		});
 
