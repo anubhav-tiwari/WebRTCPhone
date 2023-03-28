@@ -234,7 +234,7 @@ $("#status").click(function() {
 			"uri"      			: peer,
 			"contact_uri"		: peer,
 			"password"			: secret,
-			//"register_expires"	: 180
+			"register_expires"	: 7000
 		};
 
 		JsSIP.debug.enable("JsSIP:*");
